@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHAT APP</title>
+    <link rel="stylesheet" href="index.css"> <!-- Ensure this path is correct -->
+</head>
+<body>
+    <h1>Let's Chat</h1>
+
+    <div id="messages"></div> <!-- Make sure messages are being appended here -->
+    <div class="input-container">
+        <input type="text" id="message" placeholder="Enter a message">
+        <button id="sendBtn">Send</button>
+    </div>
+
+    <!-- Javascript -->
+    <!-- Ensure this path is correct and Socket.io is properly included -->
+    <script src="/socket.io/socket.io.js"></script> 
+    <!-- Ensure this path is correct and the script contains the necessary logic -->
+    <script>
+        const socket = io();
+ 
+        const messageInput = document.getElementById("message")
+        const sendBtn = document.getElementById("sendBtn")
+        const allmessages = document.getElementById("messages")
+let userID=null;
+
+        socket.on('socketId',socketID=>{
+            userID=socketID;
+            console.log("User ID : ",userID)
+        })
+
+        socket.on('message',(message)=>{
+            const {text,id,type}=message;
+            const  P = document.createElement("p");
+            P.classList.add("message")
+            P.innerText=text
+            if (userID===id) {
+                P.classList.add("sent")
+            }
+            else
+            {
+                P.classList.add("received")
+             
+            }
+          
+            allmessages.appendChild(P);
+        })
+
+        
+            sendBtn.addEventListener("click",(e)=>{
+            const message = messageInput.value;
+            messageInput.value='';
+            if (message!=='') {
+            socket.emit("user-message",message)
+            }
+
+        })   
+        
+        messageInput.addEventListener('keydown',(e)=>{
+            if (e.key==='Enter') {
+                const message = messageInput.value;
+            messageInput.value='';
+            if (message!=='') {
+            socket.emit("user-message",message)
+            }
+            }
+        })
+    </script>
+</body>
+</html>
